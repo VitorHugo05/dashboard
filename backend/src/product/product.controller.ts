@@ -77,7 +77,6 @@ export class ProductController {
 
       return {
         statusCode: HttpStatus.OK,
-        message: res
       }
     } catch (err) {
       if (err instanceof HttpException) {

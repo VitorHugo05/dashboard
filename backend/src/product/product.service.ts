@@ -1,17 +1,16 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './entities/product.entity';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CategoryService } from 'src/category/category.service';
 import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductService {
-  
   constructor(
     @InjectModel(Product.name) private productModel: Model<Product>,
-    private readonly categoryService: CategoryService
+    @Inject(forwardRef(() => CategoryService))private readonly categoryService: CategoryService
   ) { }
 
   async create(createProductDto: CreateProductDto) {
@@ -60,5 +59,15 @@ export class ProductService {
     }
     await this.productModel.findByIdAndDelete(id).exec();
   }
+
+  async findManyByIds(ids: string[]) {
+    return this.productModel.find({ _id: { $in: ids } }).exec();
+  }
   
+  async removeCategoryFromProducts(categoryId: string, productIds: string[]) {
+    await this.productModel.updateMany(
+      { _id: { $in: productIds } },
+      { $pull: { categoryIds: categoryId } }
+    ).exec();
+  }
 }
