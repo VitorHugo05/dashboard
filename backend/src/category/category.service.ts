@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category } from './entities/category.entity';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 @Injectable()
 export class CategoryService {
@@ -31,5 +31,15 @@ export class CategoryService {
       { _id: { $in: categoryIds } },
       { $addToSet: { products: productId } }
     );
+  }
+
+  async removeProductFromCategories(productId: string, categoryIds: Types.ObjectId[]) {
+    for (const categoryId of categoryIds) {
+      await this.categoryModel.findByIdAndUpdate(
+        categoryId,
+        { $pull: { products: productId } }, 
+        { new: true }
+      ).exec();
+    }
   }
 }

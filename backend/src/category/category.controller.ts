@@ -14,7 +14,6 @@ export class CategoryController {
          return {
             statusCode: HttpStatus.CREATED,
             category: res,
-            message: 'Category created'
          }
       } catch (err) {
          throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
