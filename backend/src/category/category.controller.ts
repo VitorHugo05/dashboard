@@ -1,34 +1,51 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpStatus, HttpException, Param } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
 
-@Controller('category')
+@Controller('categorys')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+   constructor(private readonly categoryService: CategoryService) { }
 
-  @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoryService.create(createCategoryDto);
-  }
+   @Post()
+   async create(@Body() createCategoryDto: CreateCategoryDto) {
+      try {
+         const res = await this.categoryService.create(createCategoryDto);
 
-  @Get()
-  findAll() {
-    return this.categoryService.findAll();
-  }
+         return {
+            statusCode: HttpStatus.CREATED,
+            category: res,
+            message: 'Category created'
+         }
+      } catch (err) {
+         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+      }
+   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoryService.findOne(+id);
-  }
+   @Get()
+   async findAll() {
+      try {
+         const res = await this.categoryService.findAll()
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
-    return this.categoryService.update(+id, updateCategoryDto);
-  }
+         return {
+            statusCode: HttpStatus.OK,
+            categories: res,
+         }
+      } catch (err) {
+         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+      }
+   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.categoryService.remove(+id);
-  }
+   @Get(':id')
+   async findById(@Param('id') id: string) {
+      try {
+         const res = await this.categoryService.findById(id)
+
+         return {
+            statusCode: HttpStatus.OK,
+            category: res,
+         }
+      } catch (err) {
+         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+      }
+   }
 }

@@ -1,26 +1,46 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Product } from './entities/product.entity';
+import { Model } from 'mongoose';
+import { CategoryService } from 'src/category/category.service';
 
 @Injectable()
 export class ProductService {
-  create(createProductDto: CreateProductDto) {
-    return 'This action adds a new product';
+  constructor(
+    @InjectModel(Product.name) private productModel: Model<Product>,
+    private readonly categoryService: CategoryService
+  ) { }
+
+  async create(createProductDto: CreateProductDto) {
+    for (const item of createProductDto.categoryIds) {
+      const category = await this.categoryService.findById(item)
+      if (!category) {
+        throw new HttpException("Category not found", HttpStatus.NOT_FOUND);
+      }
+    }
+
+    const createdProduct = new this.productModel(createProductDto);
+    const savedProduct = await createdProduct.save();
+
+    await this.categoryService.addProductToCategories(
+      savedProduct._id.toString(),
+      createProductDto.categoryIds
+    );
+
+    return savedProduct;
   }
 
-  findAll() {
-    return `This action returns all product`;
+  async findById(id: string) {
+    const product = await this.productModel.findById(id).exec()
+    if(!product) {
+      throw new HttpException("Product not found", HttpStatus.NOT_FOUND)
+    }
+    return product;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
-  }
-
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async findAll() {
+    const products = await this.productModel.find().sort({ updateAt: -1 }).exec();
+    return products
   }
 }

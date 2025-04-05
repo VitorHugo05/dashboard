@@ -24,4 +24,4 @@ export class Product {
     imageUrl: string;
 }
 
-const productSchema = SchemaFactory.createForClass(Product);
+export const productSchema = SchemaFactory.createForClass(Product);
