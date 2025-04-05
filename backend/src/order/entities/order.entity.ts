@@ -18,4 +18,4 @@ export class Order {
     total: number;
 }
 
-const orderSchema = SchemaFactory.createForClass(Order);
+export const orderSchema = SchemaFactory.createForClass(Order);
