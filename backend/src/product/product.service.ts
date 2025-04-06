@@ -49,8 +49,13 @@ export class ProductService {
     return products
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto) {
+  async update(id: string, updateProductDto: UpdateProductDto, file: Express.Multer.File) {
     const updateData: any = { ...updateProductDto };
+
+    if (file) {
+      updateData.imageUrl = await this.s3Service.upload(file);
+    }
+
     await this.findById(id);
     const product = await this.productModel.findByIdAndUpdate(id, updateData, { new: true }).exec();
     return product;

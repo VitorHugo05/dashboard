@@ -57,9 +57,14 @@ export class ProductController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+  @UseInterceptors(FileInterceptor('file'))
+  async update(
+    @Param('id') id: string, 
+    @Body() updateProductDto: UpdateProductDto,
+    @UploadedFile() file: Express.Multer.File
+  ) {
     try{
-      const res = await this.productService.update(id, updateProductDto)
+      const res = await this.productService.update(id, updateProductDto, file)
 
       return {
         statusCode: HttpStatus.OK,
