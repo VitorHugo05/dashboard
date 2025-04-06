@@ -19,8 +19,4 @@ export class CreateProductDto {
     @IsNotEmpty()
     @IsArray()
     categoryIds: string[];
-
-    @IsString()
-    @IsNotEmpty()
-    imageUrl: string;
 }

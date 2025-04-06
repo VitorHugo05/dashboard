@@ -6,6 +6,7 @@ import { CategoryModule } from './category/category.module';
 import { OrderModule } from './order/order.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
+import { S3Module } from './s3/s3.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { ConfigModule } from '@nestjs/config';
     ProductModule, 
     CategoryModule, 
     OrderModule,
-    MongooseModule.forRoot(process.env.MONGO_URI as string)
+    MongooseModule.forRoot(process.env.MONGO_URI as string),
+    S3Module
   ],
   controllers: [AppController],
   providers: [AppService],

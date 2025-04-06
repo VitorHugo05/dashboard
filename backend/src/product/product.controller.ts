@@ -1,23 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpException, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, HttpStatus, HttpException, Put, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) { }
 
   @Post()
-  async create(@Body() createProductDto: CreateProductDto) {
-    try {
-      const res = await this.productService.create(createProductDto);
+  @UseInterceptors(FileInterceptor('file'))
+  async create(
+    @Body('data') createProductDtoReq: string,
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    
+      const createProductDto: CreateProductDto = JSON.parse(createProductDtoReq);
+      const res = await this.productService.create(createProductDto, file);
       return {
         statusCode: HttpStatus.CREATED,
         product: res,
       }
-    } catch (err) {
-      throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
-    }
+    
   }
 
   @Get()

@@ -5,15 +5,17 @@ import { Product } from './entities/product.entity';
 import { Model, Types } from 'mongoose';
 import { CategoryService } from 'src/category/category.service';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { S3Service } from 'src/s3/s3.service';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<Product>,
-    @Inject(forwardRef(() => CategoryService))private readonly categoryService: CategoryService
+    @Inject(forwardRef(() => CategoryService))private readonly categoryService: CategoryService,
+    private readonly s3Service: S3Service
   ) { }
 
-  async create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDto, file: Express.Multer.File) {
     for (const item of createProductDto.categoryIds) {
       const category = await this.categoryService.findById(item)
       if (!category) {
@@ -21,7 +23,9 @@ export class ProductService {
       }
     }
 
+    const image = await this.s3Service.upload(file)
     const createdProduct = new this.productModel(createProductDto);
+    createdProduct.imageUrl = image;
     const savedProduct = await createdProduct.save();
 
     await this.categoryService.addProductToCategories(
