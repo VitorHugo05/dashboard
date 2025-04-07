@@ -1,6 +1,3 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
-
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -17,10 +14,10 @@ import { SeedModule } from 'src/seed/seed.module';
     ConfigModule.forRoot({
       isGlobal: true
     }),
+    MongooseModule.forRoot('mongodb://admin:adminpassword@localhost:27017/dashboard?authSource=admin'),
     ProductModule, 
     CategoryModule, 
     OrderModule,
-    MongooseModule.forRoot(process.env.MONGO_URI as string),
     S3Module,
     SeedModule,
   ],

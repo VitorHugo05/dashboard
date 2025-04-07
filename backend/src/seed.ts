@@ -5,7 +5,7 @@ import { NestFactory } from '@nestjs/core';
 import { SeedService } from './seed/seed.service';
 import { SeedModule } from './seed/seed.module';
 
-async function bootstrap() {
+async function bootseed() {
     const app = await NestFactory.createApplicationContext(SeedModule);
     const seedService = app.get(SeedService);
     await seedService.cleanDatabase();
@@ -19,4 +19,4 @@ async function bootstrap() {
     }
 }
 
-bootstrap();
+bootseed();
