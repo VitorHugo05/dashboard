@@ -3,8 +3,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category } from './entities/category.entity';
 import { Model, Types } from 'mongoose';
-import { Product } from 'src/product/entities/product.entity';
-import { ProductService } from 'src/product/product.service';
+import { ProductService } from '../product/product.service';
 
 @Injectable()
 export class CategoryService {

@@ -3,9 +3,8 @@ import { ProductService } from './product.service';
 import { ProductController } from './product.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Product, productSchema } from './entities/product.entity';
-import { CategoryService } from 'src/category/category.service';
-import { CategoryModule } from 'src/category/category.module';
-import { S3Module } from 'src/s3/s3.module';
+import { CategoryModule } from '../category/category.module';
+import { S3Module } from '../s3/s3.module';
 
 @Module({
   imports: [
@@ -15,6 +14,6 @@ import { S3Module } from 'src/s3/s3.module';
   ],
   controllers: [ProductController],
   providers: [ProductService],
-  exports: [ProductService]
+  exports: [ProductService, MongooseModule]
 })
 export class ProductModule {}

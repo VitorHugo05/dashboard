@@ -3,11 +3,11 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Order } from './entities/order.entity';
 import { Model } from 'mongoose';
-import { ProductService } from 'src/product/product.service';
+import { ProductService } from '../product/product.service';
+import { InvokeCommand, LambdaClient } from '@aws-sdk/client-lambda';
 
 @Injectable()
 export class OrderService {
-
 
   constructor(
     @InjectModel(Order.name) private orderModel: Model<Order>,
@@ -17,7 +17,6 @@ export class OrderService {
   async create(createOrderDto: CreateOrderDto) {
     const products = await this.productService.findManyByIds(createOrderDto.productIds);
 
-    //TODO: fazer sistema de quantidade de estoque
     const duplicates = createOrderDto.productIds.filter((id, i, arr) => arr.indexOf(id) !== i);
     if (duplicates.length > 0) {
       throw new HttpException(`Duplicate product IDs: ${[...new Set(duplicates)]}`, HttpStatus.BAD_REQUEST);
@@ -35,7 +34,21 @@ export class OrderService {
       date: new Date()
     });
 
-    return await order.save();
+    const createdOrder = await order.save()
+
+    const lambda = new LambdaClient({
+      region: 'us-east-1'
+    });
+  
+    const command = new InvokeCommand({
+      FunctionName: 'processNewOrder',
+      InvocationType: 'Event', 
+      Payload: JSON.stringify(createOrderDto)
+    });
+  
+    await lambda.send(command);
+
+    return createdOrder;
   }
 
   async findAll() {
@@ -52,14 +65,14 @@ export class OrderService {
   }
 
   async generateMetric(
-    startDate?: Date, 
-    endDate?: Date, 
-    productId?: string, 
-    categoryId?: string 
+    startDate?: Date,
+    endDate?: Date,
+    productId?: string,
+    categoryId?: string
   ) {
     const metrics = this.orderModel.aggregate([
-      
-  
+
+
     ])
   }
 }
