@@ -10,7 +10,7 @@ async function bootseed() {
     const seedService = app.get(SeedService);
     await seedService.cleanDatabase();
     try {
-        await seedService.seed(5, 10, 10);
+        await seedService.seed(5, 10, 15);
         await app.close();
         process.exit(0);
     } catch (error) {

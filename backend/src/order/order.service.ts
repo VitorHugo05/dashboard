@@ -70,9 +70,37 @@ export class OrderService {
     productId?: string,
     categoryId?: string
   ) {
-    const metrics = this.orderModel.aggregate([
-
-
-    ])
+    const metrics = await this.orderModel.aggregate([
+      {
+        $match: {
+          ...(startDate && { date: { $gte: startDate } }),
+          ...(endDate && { date: { $lte: endDate } }),
+          ...(productId && { productIds: productId }),
+          ...(categoryId && { categoryIds: categoryId })
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalOrders: { $sum: 1 },
+          totalRevenue: { $sum: '$total' },
+          averageOrderValue: { $avg: '$total' }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          totalOrders: 1,
+          totalRevenue: 1,
+          averageOrderValue: { $round: ['$averageOrderValue', 2] }
+        }
+      }
+    ]);
+  
+    return metrics.length > 0 ? metrics[0] : {
+      totalOrders: 0,
+      totalRevenue: 0,
+      averageOrderValue: 0
+    };
   }
 }

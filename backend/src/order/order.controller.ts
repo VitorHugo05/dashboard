@@ -54,24 +54,4 @@ export class OrderController {
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
     }
   }
-
-  @Get('metrics')
-  async metrics(
-    @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string,
-    @Query('productId') productId?: string,
-    @Query('categoryId') categoryId?: string,
-  ) {
-    const res = await this.orderService.generateMetric(
-      startDate ? new Date(startDate) : undefined,
-      endDate ? new Date(endDate) : undefined,
-      productId,
-      categoryId,
-    );
-
-    return {
-      statusCode: HttpStatus.OK,
-      metrics: res,
-    };
-  }
 }
