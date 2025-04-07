@@ -14,7 +14,7 @@ import { SeedModule } from 'src/seed/seed.module';
     ConfigModule.forRoot({
       isGlobal: true
     }),
-    MongooseModule.forRoot('mongodb://admin:adminpassword@localhost:27017/dashboard?authSource=admin'),
+    MongooseModule.forRoot(process.env.MONGO_URI as string),
     ProductModule, 
     CategoryModule, 
     OrderModule,

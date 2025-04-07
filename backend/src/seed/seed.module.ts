@@ -11,7 +11,7 @@ import { ConfigModule } from '@nestjs/config';
         ConfigModule.forRoot({
             isGlobal: true
         }),
-        MongooseModule.forRoot('mongodb://admin:adminpassword@localhost:27017/dashboard?authSource=admin'),
+        MongooseModule.forRoot(process.env.MONGO_URI as string),
         ProductModule,
         CategoryModule,
         OrderModule
