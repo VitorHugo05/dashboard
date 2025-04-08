@@ -19,7 +19,7 @@ export class ProductController {
       const res = await this.productService.create(createProductDto, file);
       return {
         statusCode: HttpStatus.CREATED,
-        product: res,
+        data: res,
       }
     
   }
@@ -31,7 +31,7 @@ export class ProductController {
 
       return {
         statusCode: HttpStatus.OK,
-        products: res
+        data: res
       }
     } catch (err) {
       
@@ -46,7 +46,7 @@ export class ProductController {
 
       return {
         statusCode: HttpStatus.OK,
-        product: res
+        data: res
       }
     } catch (err) {
       if (err instanceof HttpException) {
@@ -68,7 +68,7 @@ export class ProductController {
 
       return {
         statusCode: HttpStatus.OK,
-        product: res
+        data: res
       }
     } catch (err) {
       if (err instanceof HttpException) {
@@ -86,6 +86,7 @@ export class ProductController {
 
       return {
         statusCode: HttpStatus.OK,
+        data: res
       }
     } catch (err) {
       if (err instanceof HttpException) {

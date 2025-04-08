@@ -1,9 +1,11 @@
 import * as React from 'react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import { Outlet } from 'react-router';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import type { Navigation } from '@toolpad/core/AppProvider';
+import { Category, Inventory } from '@mui/icons-material';
 
 const NAVIGATION: Navigation = [
   {
@@ -16,13 +18,24 @@ const NAVIGATION: Navigation = [
   },
   {
     segment: 'orders',
-    title: 'Orders',
+    title: 'Pedidos',
     icon: <ShoppingCartIcon />,
+  },
+  {
+    segment: 'products',
+    title: 'Produtos',
+    icon: <Inventory />,
+  },
+  {
+    segment: 'categories',
+    title: 'Categorias',
+    icon: <Category />,
   },
 ];
 
 const BRANDING = {
-  title: "frontend",
+  title: "Dashboard",
+  logo: <QueryStatsIcon sx={{fontSize: 40, color: "#42a5f5"}} />
 };
 
 

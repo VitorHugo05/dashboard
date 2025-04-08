@@ -3,9 +3,11 @@ import * as ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import App from './App';
 import Layout from './layouts/dashboard';
-import DashboardPage from './pages';
-import OrdersPage from './pages/orders';
 
+import OrdersPage from './pages/orders';
+import DashboardPage from './pages/dashboard';
+import ProductsPage from './pages/products';
+import CategoriesPage from './pages/categories';
 
 const router = createBrowserRouter([
   {
@@ -21,8 +23,16 @@ const router = createBrowserRouter([
           },
           {
             path: 'orders',
-            Component: OrdersPage,
+            Component: OrdersPage
           },
+          {
+            path: 'products',
+            Component: ProductsPage
+          },
+          {
+            path: 'categories',
+            Component: CategoriesPage
+          }
         ],
       },
     ],
