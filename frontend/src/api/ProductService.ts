@@ -1,7 +1,8 @@
 import { api, Response } from './api'
 
 interface GetProduct {
-    products: Product[]
+    statusCode: number;
+    data: Product[];
 }
 
 interface CreateProduct {
@@ -11,7 +12,7 @@ interface CreateProduct {
     categoryIds: string[];
 }
 
-interface Product {
+export interface Product {
     _id: string;
     name: string;
     description: string;
@@ -21,8 +22,8 @@ interface Product {
 }
 
 class ProductService {
-    async get(): Promise<Response<GetProduct>> {
-        const response = await api.get<Response<GetProduct>>('/products')
+    async get(): Promise<Response<Product[]>> {
+        const response = await api.get<Response<Product[]>>('/products')
         return response.data;
     }
 
