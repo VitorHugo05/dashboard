@@ -44,7 +44,7 @@ export class SeedService {
             const fakeProduct = new Product();
             fakeProduct.description = faker.commerce.productDescription();
             fakeProduct.name = faker.commerce.productName();
-            fakeProduct.price = faker.number.int({ min: 100, max: 50000 });
+            fakeProduct.price = faker.number.int({ min: 100, max: 3000 });
             const numberOfCategories = faker.number.int({ min: 1, max: 3 });
             const randomCategories = faker.helpers.arrayElements(categories, numberOfCategories);
             fakeProduct.categoryIds = randomCategories.map(category => category._id);
