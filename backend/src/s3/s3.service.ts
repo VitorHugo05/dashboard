@@ -24,6 +24,8 @@ export class S3Service {
             ACL: 'public-read',
         };
 
-        return (await this.s3.upload(uploadParams).promise()).Location;
+        await this.s3.upload(uploadParams).promise();
+        return `http://localhost:4566/${process.env.AWS_BUCKETNAME}/${file.originalname}`;
+
     }
 }
