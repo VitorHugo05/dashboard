@@ -11,6 +11,9 @@ export class Category {
     @Prop()
     name: string;
 
+    @Prop()
+    createdAt: Date;
+
     @Prop({ type: [{ type: Types.ObjectId, ref: 'Product' }] })
     products: Types.ObjectId[]
 }

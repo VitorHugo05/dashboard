@@ -32,6 +32,7 @@ export class SeedService {
         for (var i = 0; i < quantity; i++) {
             const fakeCategory = new Category();
             fakeCategory.name = faker.commerce.department();
+            fakeCategory.createdAt = new Date()
             categories.push(fakeCategory);
         }
         return this.categorySchema.insertMany(categories);

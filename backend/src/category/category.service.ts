@@ -15,6 +15,7 @@ export class CategoryService {
 
   async create(createCategoryDto: CreateCategoryDto) {
     const createdCategory = new this.categoryModel(createCategoryDto);
+    createdCategory.createdAt = new Date()
     return createdCategory.save()
   }
 
