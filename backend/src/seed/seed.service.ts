@@ -52,6 +52,7 @@ export class SeedService {
                 height: 200,
                 width: 200
             })
+            fakeProduct.createdAt = new Date()
             products.push(fakeProduct);
         }
         return this.productSchema.insertMany(products);

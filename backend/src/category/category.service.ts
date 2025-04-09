@@ -23,7 +23,7 @@ export class CategoryService {
     return categorys;
   }
 
-  async findById(id: string): Promise<Category | null> {
+  async findById(id: string) {
     const category = await this.categoryModel.findById(id).exec()
     if (!category) {
       throw new HttpException("Category not found", HttpStatus.NOT_FOUND)

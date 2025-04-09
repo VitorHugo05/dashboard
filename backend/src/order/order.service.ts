@@ -8,7 +8,6 @@ import { InvokeCommand, LambdaClient } from '@aws-sdk/client-lambda';
 
 @Injectable()
 export class OrderService {
-
   constructor(
     @InjectModel(Order.name) private orderModel: Model<Order>,
     private readonly productService: ProductService
@@ -102,5 +101,21 @@ export class OrderService {
       totalRevenue: 0,
       averageOrderValue: 0
     };
+  }
+
+  async update(id: string, createOrderDto: Partial<CreateOrderDto>) {
+    const updateData: any = { ...createOrderDto };
+
+    await this.findById(id);
+    const order = await this.orderModel.findByIdAndUpdate(id, updateData, { new: true }).exec();
+    return order;
+  }
+
+  async delete(id: string) {
+    const order = await this.orderModel.findById(id).exec()
+    if (!order) {
+      throw new HttpException("Order not found", HttpStatus.NOT_FOUND)
+    }
+    await this.orderModel.findByIdAndDelete(id).exec();
   }
 }

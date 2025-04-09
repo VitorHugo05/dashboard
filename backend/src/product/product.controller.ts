@@ -3,6 +3,12 @@ import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Product } from './entities/product.entity';
+
+interface ResponseType<T> {
+  statusCode: HttpStatus,
+  data?: T,
+}
 
 @Controller('products')
 export class ProductController {
@@ -13,7 +19,7 @@ export class ProductController {
   async create(
     @Body('data') createProductDtoReq: string,
     @UploadedFile() file: Express.Multer.File
-  ) {
+  ): Promise<ResponseType<Product>> {
     
       const createProductDto: CreateProductDto = JSON.parse(createProductDtoReq);
       const res = await this.productService.create(createProductDto, file);
@@ -25,7 +31,7 @@ export class ProductController {
   }
 
   @Get()
-  async findAll() {
+  async findAll(): Promise<ResponseType<Product[]>> {
     try {
       const res = await this.productService.findAll();
 
@@ -40,9 +46,13 @@ export class ProductController {
   }
 
   @Get(':id')
-  async findById(@Param('id') id: string) {
+  async findById(@Param('id') id: string): Promise<ResponseType<Product>> {
     try {
       const res = await this.productService.findById(id);
+
+      if (!res) {
+        throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
+      }
 
       return {
         statusCode: HttpStatus.OK,
@@ -60,11 +70,15 @@ export class ProductController {
   @UseInterceptors(FileInterceptor('file'))
   async update(
     @Param('id') id: string, 
-    @Body() updateProductDto: UpdateProductDto,
+    @Body() updateProductDto: Partial<UpdateProductDto>,
     @UploadedFile() file: Express.Multer.File
-  ) {
+  ): Promise<ResponseType<Product>> {
     try{
       const res = await this.productService.update(id, updateProductDto, file)
+
+      if (!res) {
+        throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
+      }
 
       return {
         statusCode: HttpStatus.OK,
@@ -80,13 +94,11 @@ export class ProductController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string): Promise<ResponseType<Product>> {
     try {
-      const res = await this.productService.delete(id);
-
+      await this.productService.delete(id);
       return {
         statusCode: HttpStatus.OK,
-        data: res
       }
     } catch (err) {
       if (err instanceof HttpException) {
