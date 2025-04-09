@@ -12,7 +12,6 @@ export class ProductService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<Product>,
     @Inject(forwardRef(() => CategoryService)) private readonly categoryService: CategoryService,
-    private readonly logger = new Logger(ProductService.name),
     private readonly s3Service: S3Service
   ) { }
 

@@ -70,10 +70,11 @@ export class ProductController {
   @UseInterceptors(FileInterceptor('file'))
   async update(
     @Param('id') id: string, 
-    @Body() updateProductDto: Partial<UpdateProductDto>,
+    @Body('data') updateProductDtoString: string,
     @UploadedFile() file: Express.Multer.File
   ): Promise<ResponseType<Product>> {
     try{
+      const updateProductDto: UpdateProductDto = JSON.parse(updateProductDtoString);
       const res = await this.productService.update(id, updateProductDto, file)
 
       if (!res) {
