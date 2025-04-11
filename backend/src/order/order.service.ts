@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Order } from './entities/order.entity';
 import { Model } from 'mongoose';
 import { ProductService } from '../product/product.service';
-import { InvokeCommand, LambdaClient } from '@aws-sdk/client-lambda';
+import axios from 'axios'
 
 @Injectable()
 export class OrderService {
@@ -34,19 +34,17 @@ export class OrderService {
     });
 
     const createdOrder = await order.save()
+    try {
+      const lambdaEndpoint = 'http://host.docker.internal:3001/dev/order';
+      const payload = {
+        orderId: createdOrder._id,
+        total: createdOrder.total,
+      };
 
-    const lambda = new LambdaClient({
-      region: 'us-east-1'
-    });
-  
-    const command = new InvokeCommand({
-      FunctionName: 'processNewOrder',
-      InvocationType: 'Event', 
-      Payload: JSON.stringify(createOrderDto)
-    });
-  
-    await lambda.send(command);
-
+      await axios.post(lambdaEndpoint, payload);
+    } catch (error) {
+      console.error('Erro ao invocar a função de notificação:', error.message);
+    }
     return createdOrder;
   }
 
@@ -63,27 +61,14 @@ export class OrderService {
     return order
   }
 
-  async generateMetric(
-    startDate?: Date,
-    endDate?: Date,
-    productId?: string,
-    categoryId?: string
-  ) {
-    const metrics = await this.orderModel.aggregate([
-      {
-        $match: {
-          ...(startDate && { date: { $gte: startDate } }),
-          ...(endDate && { date: { $lte: endDate } }),
-          ...(productId && { productIds: productId }),
-          ...(categoryId && { categoryIds: categoryId })
-        }
-      },
+  async metrics() {
+    const result = await this.orderModel.aggregate([
       {
         $group: {
           _id: null,
           totalOrders: { $sum: 1 },
-          totalRevenue: { $sum: '$total' },
-          averageOrderValue: { $avg: '$total' }
+          totalRevenue: { $sum: "$total" },
+          averageOrderValue: { $avg: "$total" }
         }
       },
       {
@@ -91,15 +76,45 @@ export class OrderService {
           _id: 0,
           totalOrders: 1,
           totalRevenue: 1,
-          averageOrderValue: { $round: ['$averageOrderValue', 2] }
+          averageOrderValue: 1
         }
       }
     ]);
-  
-    return metrics.length > 0 ? metrics[0] : {
-      totalOrders: 0,
-      totalRevenue: 0,
-      averageOrderValue: 0
+
+    const ordersByPeriod = await this.orderModel.aggregate([
+      {
+        $group: {
+          _id: {
+            day: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            week: { $dateToString: { format: "%Y-W%U", date: "$date" } },
+            month: { $dateToString: { format: "%Y-%m", date: "$date" } }
+          },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          daily: { $push: { k: "$_id.day", v: "$count" } },
+          weekly: { $push: { k: "$_id.week", v: "$count" } },
+          monthly: { $push: { k: "$_id.month", v: "$count" } }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          daily: { $arrayToObject: "$daily" },
+          weekly: { $arrayToObject: "$weekly" },
+          monthly: { $arrayToObject: "$monthly" }
+        }
+      }
+    ]);
+
+    return {
+      totalOrders: result[0]?.totalOrders || 0,
+      totalRevenue: result[0]?.totalRevenue || 0,
+      averageOrderValue: result[0]?.averageOrderValue || 0,
+      ordersByPeriod: ordersByPeriod[0] || { daily: {}, weekly: {}, monthly: {} }
     };
   }
 

@@ -1,0 +1,38 @@
+service: order-notification-service
+
+frameworkVersion: "4"
+configValidationMode: off
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  timeout: 30
+  region: us-east-1
+  stage: dev
+  environment:
+    AWS_ENDPOINT: http://localhost:4566
+    AWS_REGION: us-east-1
+    AWS_ACCESS_KEY_ID: test
+    AWS_SECRET_ACCESS_KEY: test
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - ses:*
+          Resource: "*"  
+
+functions:
+  createOrder:
+    handler: src/lambda/handler.createOrder
+    events:
+      - http:
+          path: order
+          method: post
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 3001

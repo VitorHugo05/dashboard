@@ -1,4 +1,4 @@
-import { Controller, Get, HttpStatus, Query } from "@nestjs/common";
+import { Controller, Get, HttpException, HttpStatus, Query } from "@nestjs/common";
 import { OrderService } from "./order.service";
 
 interface ResponseType<T> {
@@ -19,22 +19,16 @@ export class MetricsController {
       ) { }
 
     @Get()
-    async metrics(
-      @Query('startDate') startDate?: string,
-      @Query('endDate') endDate?: string,
-      @Query('productId') productId?: string,
-      @Query('categoryId') categoryId?: string,
-    ): Promise<ResponseType<Metrics>> {
-      const res: Metrics = await this.orderService.generateMetric(
-        startDate ? new Date(startDate) : undefined,
-        endDate ? new Date(endDate) : undefined,
-        productId,
-        categoryId,
-      );
+    async metrics() {
+      try {
+        const data = await this.orderService.metrics();
   
-      return {
-        statusCode: HttpStatus.OK,
-        data: res,
-      };
+        return {
+          statusCode: HttpStatus.OK,
+          data,
+        }
+      } catch (error) {
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      }
     }
 }

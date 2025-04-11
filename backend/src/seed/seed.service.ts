@@ -32,7 +32,7 @@ export class SeedService {
         for (var i = 0; i < quantity; i++) {
             const fakeCategory = new Category();
             fakeCategory.name = faker.commerce.department();
-            fakeCategory.createdAt = new Date()
+            fakeCategory.createdAt = faker.date.between({ from: '2025-01-01', to: Date.now() });
             categories.push(fakeCategory);
         }
         return this.categorySchema.insertMany(categories);
@@ -53,7 +53,7 @@ export class SeedService {
                 height: 200,
                 width: 200
             })
-            fakeProduct.createdAt = new Date()
+            fakeProduct.createdAt = faker.date.between({ from: '2025-01-01', to: Date.now() })
             products.push(fakeProduct);
         }
         return this.productSchema.insertMany(products);
@@ -64,7 +64,7 @@ export class SeedService {
         const products = await this.productSchema.find();
         for (var i = 0; i < quantity; i++) {
             const fakeOrder = new Order();
-            fakeOrder.date = faker.date.recent();
+            fakeOrder.date = faker.date.between({ from: '2025-01-01', to: Date.now() });
             const numberOfProducts = faker.number.int({ min: 1, max: products.length });
             const randomProducts = faker.helpers.arrayElements(products, numberOfProducts);
             fakeOrder.productIds = randomProducts.map(product => product._id);
