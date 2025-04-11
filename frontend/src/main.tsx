@@ -1,13 +1,15 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom/client';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import Layout from './layout.tsx'
 import { createBrowserRouter, RouterProvider } from 'react-router';
-import App from './App';
-import Layout from './layouts/dashboard';
-
-import OrdersPage from './pages/orders';
-import DashboardPage from './pages/dashboard';
-import ProductsPage from './pages/products';
-import CategoriesPage from './pages/categories';
+import App from './app.tsx';
+import DashboardPage from './pages/dashboard/index.tsx';
+import ProductsPage from './pages/products/index.tsx';
+import CategoriesPage from './pages/categories/index.tsx';
+import OrdersPage from './pages/orders/index.tsx';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { ptBR } from 'date-fns/locale';
 
 const router = createBrowserRouter([
   {
@@ -18,20 +20,20 @@ const router = createBrowserRouter([
         Component: Layout,
         children: [
           {
-            path: '',
+            path: '/',
             Component: DashboardPage,
           },
           {
-            path: 'orders',
-            Component: OrdersPage
-          },
-          {
-            path: 'products',
+            path: '/products',
             Component: ProductsPage
           },
           {
-            path: 'categories',
+            path: '/categories',
             Component: CategoriesPage
+          },
+          {
+            path: '/orders',
+            Component: OrdersPage
           }
         ],
       },
@@ -39,8 +41,10 @@ const router = createBrowserRouter([
   },
 ]);
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>,
-);
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
+      <RouterProvider router={router} />
+    </LocalizationProvider>
+  </StrictMode>,
+)
