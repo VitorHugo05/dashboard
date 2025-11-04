@@ -3,7 +3,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import Layout from './layout.tsx'
 import { createBrowserRouter, RouterProvider } from 'react-router';
-import App from './app.tsx';
+import App from './App.tsx';
 import DashboardPage from './pages/dashboard/index.tsx';
 import ProductsPage from './pages/products/index.tsx';
 import CategoriesPage from './pages/categories/index.tsx';
